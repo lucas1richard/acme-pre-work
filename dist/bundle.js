@@ -56,12 +56,12 @@
 
 	var db = new _AcmeDB2.default({ users: users });
 
-	console.log(db.users.length);
-	console.log(db.users[0].id);
+	console.log('db.users.length:', db.users.length);
+	console.log('db.users[0].id:', db.users[0].id);
 
 	db.addUser({ name: 'Larry' });
 
-	console.log('db.showUsers()', db.showUsers());
+	console.log('db.showUsers():', db.showUsers());
 	console.log('db.findById(2).name:', db.findById(2).name);
 
 	db.addUser({ name: 'Curly' });
@@ -71,7 +71,7 @@
 
 	db.editUser({ id: 2, name: 'Laary ' });
 
-	console.log('db.showUsers()', db.showUsers());
+	console.log('db.showUsers():', db.showUsers());
 
 /***/ },
 /* 1 */
@@ -101,12 +101,29 @@
 			key: 'addUser',
 			value: function addUser(obj) {
 				var newUser = obj;
-				var getMax = function getMax(max, el) {
+				newUser.id = this.users.reduce(function (max, el) {
 					return el.id > max ? el.id : max;
-				};
-				newUser.id = this.users.reduce(getMax, 0) + 1;
+				}, 0) + 1;
 				this.users.push(newUser);
-				console.log(this.users);
+			}
+		}, {
+			key: 'editUser',
+			value: function editUser(obj) {
+				for (var i = 0; i < this.users.length; i++) {
+					if (this.users[i].id === obj.id) {
+						this.users[i] = Object.assign({}, this.users[i], obj);
+						break;
+					}
+				}
+			}
+		}, {
+			key: 'findById',
+			value: function findById(idToFind) {
+				for (var i = 0; i < this.users.length; i++) {
+					if (this.users[i].id === idToFind) {
+						return this.users[i];
+					}
+				}
 			}
 		}, {
 			key: 'removeUserById',
@@ -119,29 +136,11 @@
 				}
 			}
 		}, {
-			key: 'editUser',
-			value: function editUser(obj) {
-				this.users = this.users.map(function (el, index) {
-					if (el.id === obj.id) el.name = obj.name;
-					return el;
-				});
-			}
-		}, {
 			key: 'showUsers',
 			value: function showUsers() {
-				var getNames = function getNames(accum, el) {
-					return accum += ' ' + el.name;
-				};
-				return this.users.reduce(getNames, '');
-			}
-		}, {
-			key: 'findById',
-			value: function findById(idToFind) {
-				for (var i = 0; i < this.users.length; i++) {
-					if (this.users[i].id === idToFind) {
-						return this.users[i];
-					}
-				}
+				return this.users.map(function (el) {
+					return el.name;
+				}).join(' ');
 			}
 		}]);
 
